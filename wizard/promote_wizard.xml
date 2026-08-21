@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_promote_wizard_form" model="ir.ui.view">
+        <field name="name">promote.wizard.form</field>
+        <field name="model">promote.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Promote Students">
+                <field name="line_ids">
+                    <list editable="bottom" create="0" delete="0">
+                        <field name="is_selected"/>
+                        <field name="student_id" readonly="1" force_save="1"/>
+                        <field name="total_marks" readonly="1" force_save="1"/>
+                        <field name="current_branch_id" readonly="1" force_save="1"/>
+                        <field name="current_level_id" readonly="1" force_save="1"/>
+                        <field name="current_grade_id" readonly="1" force_save="1"/>
+                        <field name="next_branch_id"/>
+                        <field name="next_level_id"/>
+                        <field name="next_grade_id"/>
+                    </list>
+                </field>
+                <footer>
+                    <button string="Promote" name="action_promote_students" type="object" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_promote_wizard" model="ir.actions.act_window">
+        <field name="name">Batch Student Promotion</field>
+        <field name="res_model">promote.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <menuitem id="menu_promote_wizard"
+              name="Promote Students"
+              parent="school.menu_student_student"
+              action="action_promote_wizard"
+              groups="school.group_school_admin"/>
+</odoo>

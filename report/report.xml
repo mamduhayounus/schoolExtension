@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- REPORT ACTION -->
+    <record id="action_report_transcript" model="ir.actions.report">
+        <field name="name">Print Transcript</field>
+        <field name="model">student.student</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">school_extension.transcript</field>
+        <field name="report_file">school_extension.transcript</field>
+        <field name="print_report_name">'Transcript - %s' % (object.name)</field>
+        <field name="binding_model_id" ref="model_student_student"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <!-- QWEB REPORT LAYOUT TEMPLATE -->
+    <template id="transcript">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="student">
+                <t t-call="web.external_layout">
+                    <div class="page pt-0 mt-0" style="padding-top: 0px !important; margin-top: 0px !important;">
+
+                        <!-- Header Row: Title on Left, Photo on Right -->
+                        <div class="row mb-4 align-items-center">
+                            <div class="col-8 text-start">
+                                <h2>Transcript</h2>
+                                <p class="text-muted mb-0">Student Card</p>
+                            </div>
+                            <div class="col-4 text-end">
+                                <t t-if="student.uploaded_image">
+                                    <img t-att-src="image_data_uri(student.uploaded_image)"
+                                         style="max-height: 120px; max-width: 100%; border: 1px solid #050505; border-radius: 4px;"/>
+                                </t>
+                                <t t-else="">
+                                    <div style="height: 100px; width: 100px; border: 1px dashed #ccc; line-height: 100px; color: #aaa; border-radius: 4px; display: inline-block;" class="text-center">
+                                        No Photo
+                                    </div>
+                                </t>
+                            </div>
+                        </div>
+
+                        <!-- Top Student Information Table (4-Column Layout) -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <table class="table table-bordered mb-0" style="width: 100%;">
+                                    <tbody>
+                                        <tr>
+                                            <td style="width: 25%; background-color: #cfcfcf; color: #5e3b69;"><strong>NAME:</strong></td>
+                                            <td style="width: 25%;"><span t-field="student.name"/></td>
+                                            <td style="width: 25%; background-color: #cfcfcf; color: #5e3b69;"><strong>ID:</strong></td>
+                                            <td style="width: 25%;"><span t-field="student.std_id"/></td>
+                                        </tr>
+                                        <tr>
+                                            <td style="background-color: #cfcfcf; color: #5e3b69;"><strong>CODE:</strong></td>
+                                            <td><span t-field="student.code"/></td>
+                                            <td style="background-color: #cfcfcf; color: #5e3b69;"><strong>INSTITUTE:</strong></td>
+                                            <td><span t-field="student.institute_id.name"/></td>
+                                        </tr>
+                                        <tr>
+                                            <td style="background-color: #cfcfcf; color: #5e3b69;"><strong>BRANCH:</strong></td>
+                                            <td><span t-field="student.branch_id.name"/></td>
+                                            <td style="background-color: #cfcfcf; color: #5e3b69;"><strong>LEVEL:</strong></td>
+                                            <td><span t-field="student.level_id.name"/></td>
+                                        </tr>
+                                        <tr>
+                                            <td style="background-color: #cfcfcf; color: #5e3b69;"><strong>GRADE:</strong></td>
+                                            <td><span t-field="student.grade_id.name"/></td>
+                                            <td style="background-color: #cfcfcf; color: #5e3b69;"><strong>SECTION:</strong></td>
+                                            <td><span t-field="student.section_id.name"/></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Section Heading -->
+                        <h4 style="margin-top: 35px; margin-bottom: 15px; color: #5e3b69; font-weight: bold;">
+                            Academic Performance
+                        </h4>
+
+                        <!-- Academic Performance Table -->
+                        <table class="table table-bordered mb-0" style="width: 100%;">
+                            <thead>
+                                <tr class="text-center">
+                                    <th style="background-color: #cfcfcf; color: #5e3b69;">Grade</th>
+                                    <th style="background-color: #cfcfcf; color: #5e3b69;">Section</th>
+                                    <th style="background-color: #cfcfcf; color: #5e3b69;">1st Term</th>
+                                    <th style="background-color: #cfcfcf; color: #5e3b69;">Mid Term</th>
+                                    <th style="background-color: #cfcfcf; color: #5e3b69;">2nd Term</th>
+                                    <th style="background-color: #cfcfcf; color: #5e3b69;">Final Term</th>
+                                    <th style="background-color: #cfcfcf; color: #5e3b69;">Total Marks</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-foreach="student.academic_transcript_ids" t-as="line">
+                                    <tr class="text-center">
+                                        <td><span t-field="line.grade_id.name"/></td>
+                                        <td><span t-field="line.section_id.name"/></td>
+                                        <td><span t-field="line.first_marks"/></td>
+                                        <td><span t-field="line.mid_marks"/></td>
+                                        <td><span t-field="line.second_marks"/></td>
+                                        <td><span t-field="line.final_marks"/></td>
+                                        <td><span t-field="line.total_marks"/></td>
+                                    </tr>
+                                </t>
+                            </tbody>
+                        </table>
+
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+</odoo>

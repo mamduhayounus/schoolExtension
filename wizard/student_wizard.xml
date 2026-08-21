@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- WIZARD FORM VIEW  -->
+    <record id="view_student_wizard_form" model="ir.ui.view">
+        <field name="name">student.wizard.form</field>
+        <field name="model">student.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Update Academic Information">
+                <group>
+                    <group>
+                        <field name="student_id" readonly="1"/>
+                        <field name="institute_id" required="1"
+                               options="{'no_create': True, 'no_create_edit': True, 'no_quick_create': True}"/>
+
+                        <field name="current_institute_id" invisible="1"/>
+                        <field name="is_institute_changed" invisible="1"/>
+                        <field name="new_std_id" invisible="not is_institute_changed"/>
+
+                        <field name="branch_id" required="1"
+                               domain="[('institute_id', '=', institute_id)]"
+                               options="{'no_create': True, 'no_create_edit': True, 'no_quick_create': True}"/>
+                    </group>
+                    <group>
+                        <field name="level_id" required="1"
+                               domain="[('branch_ids', 'in', [branch_id])]"
+                               options="{'no_create': True, 'no_create_edit': True, 'no_quick_create': True}"/>
+
+                        <field name="grade_id" required="1"
+                               domain="[('level_id', '=', level_id)]"
+                               options="{'no_create': True, 'no_create_edit': True, 'no_quick_create': True}"/>
+
+                        <field name="section_id"
+                               domain="[('grade_ids', 'in', [grade_id])]"
+                               options="{'no_create': True, 'no_create_edit': True, 'no_quick_create': True}"/>
+                    </group>
+                </group>
+                <footer>
+                    <button string="Apply Changes" name="action_update_academic_info" type="object" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- ACTION MENU BINDING -->
+    <record id="action_student_wizard" model="ir.actions.act_window">
+        <field name="name">Update Academic Info</field>
+        <field name="res_model">student.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="binding_model_id" ref="school.model_student_student"/>
+        <field name="binding_view_types">form</field>
+    </record>
+
+</odoo>

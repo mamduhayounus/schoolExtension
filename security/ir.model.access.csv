@@ -1,0 +1,10 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_student_wizard,access.student.wizard,model_student_wizard,base.group_user,1,1,1,1
+access_enrollment_history,access_enrollment_history,model_enrollment_history,base.group_user,1,1,1,1
+access_academic_transcript,access_academic_transcript,model_academic_transcript,school.group_school_admin,1,1,1,1
+access_promote_wizard,student.promote.wizard,model_promote_wizard,school.group_school_admin,1,1,1,1
+access_promote_wizard_line,student.promote.wizard.line,model_promote_wizard_line,school.group_school_admin,1,1,1,1
+access_print_wizard,student.print.wizard,model_print_wizard,school.group_school_admin,1,1,1,1
+access_print_wizard_line,access_print_wizard_line,model_print_wizard_line,school.group_school_admin,1,1,1,1
+access_leave_wizard,student.leave.wizard,model_leave_wizard,school.group_school_admin,1,1,1,1
+access_student_leave,student.student.leave,model_student_leave,school.group_school_admin,1,1,1,1

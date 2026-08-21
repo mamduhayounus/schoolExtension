@@ -1,0 +1,277 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- 1. Kanban View -->
+    <record id="view_student_kanban" model="ir.ui.view">
+        <field name="name">student.student.kanban</field>
+        <field name="model">student.student</field>
+        <field name="arch" type="xml">
+            <kanban>
+                <field name="code"/>
+                <field name="name"/>
+                <field name="grade_id"/>
+                <field name="status"/>
+                <field name="institute_id"/>
+                <field name="uploaded_image"/>
+                <templates>
+                    <t t-name="kanban">
+                        <div class="o_kanban_record_has_image_fill o_res_partner_kanban">
+                            <field name="uploaded_image"
+                                   widget="image"
+                                   class="o_kanban_image_fill_left"
+                                   options="{'zoom': true}"/>
+
+                            <div class="oe_kanban_details p-2">
+                                <div>
+                                    <strong class="o_kanban_record_title text-primary fs-5">
+                                        <field name="name"/>
+                                    </strong>
+                                    <div class="text-muted">
+                                        <strong>ID:</strong> <field name="code"/>
+                                    </div>
+                                    <div class="text-muted" invisible="not grade_id">
+                                        <strong>Grade:</strong> <field name="grade_id"/>
+                                    </div>
+                                    <div class="text-muted" invisible="not institute_id">
+                                        <strong>Institute:</strong> <field name="institute_id"/>
+                                    </div>
+                                </div>
+
+                                <div class="o_kanban_record_bottom mt-2">
+                                    <div class="oe_kanban_bottom_left">
+                                        <field name="status"
+                                               widget="badge"
+                                               decoration-success="status == 'accept'"
+                                               decoration-danger="status == 'reject'"
+                                               decoration-info="status == 'draft'"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- 2. Action View Mode Override -->
+    <record id="school.action_student" model="ir.actions.act_window">
+        <field name="view_mode">kanban,list,form</field>
+    </record>
+
+    <!-- 3. Form Extension: Smart Buttons -->
+    <record id="view_student_form_inherit_smart_buttons" model="ir.ui.view">
+        <field name="name">student.student.form.inherit.smart.buttons</field>
+        <field name="model">student.student</field>
+        <field name="inherit_id" ref="school.view_student_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet/field[@name='uploaded_image']" position="before">
+                <div class="oe_button_box" name="button_box" >
+                    <button name="action_view_enrollment_history"
+                            type="object"
+                            class="oe_stat_button"
+                            icon="fa-history">
+                        <field name="enrollment_history_count" widget="statinfo" string="History"/>
+                    </button>
+
+                    <button name="action_view_academic_transcripts"
+                            type="object"
+                            class="oe_stat_button"
+                            icon="fa-graduation-cap">
+                        <field name="academic_transcript_count" widget="statinfo" string="Transcripts"/>
+                    </button>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- 4. Form Extension: Weight & Height -->
+    <record id="view_student_ex_form" model="ir.ui.view">
+        <field name="name">student.ex.form.toggle</field>
+        <field name="model">student.student</field>
+        <field name="inherit_id" ref="school.view_student_form"/>
+        <field name="arch" type="xml">
+
+            <xpath expr="//sheet" position="before">
+                <field name="is_view_hidden" invisible="1"/>
+                <header>
+                    <button name="576"
+                            string="Hide"
+                            type="action"
+                            class="btn-warning"
+                            invisible="is_view_hidden"
+                    />
+
+                    <button name="577"
+                            string="Show"
+                            type="action"
+                            class="btn-primary"
+                            invisible="not is_view_hidden"
+                    />
+                </header>
+            </xpath>
+
+            <xpath expr="//notebook" position="attributes">
+                <attribute name="invisible">is_view_hidden</attribute>
+            </xpath>
+            <xpath expr="//button[@name='action_accept']" position="attributes">
+                <attribute name="invisible">is_view_hidden or status != 'draft'</attribute>
+            </xpath>
+            <xpath expr="//button[@name='action_reject']" position="attributes">
+                <attribute name="invisible">is_view_hidden or status != 'draft'</attribute>
+            </xpath>
+
+            <xpath expr="//button[@name='action_draft']" position="attributes">
+                <attribute name="invisible">is_view_hidden or status not in ['accept', 'reject']</attribute>
+            </xpath>
+            <xpath expr="//field[@name='status'][@widget='statusbar']" position="attributes">
+                <attribute name="invisible">is_view_hidden</attribute>
+            </xpath>
+            <xpath expr="//div[@name='button_box']" position="attributes">
+                <attribute name="invisible">is_view_hidden</attribute>
+            </xpath>
+            <xpath expr="//button[@name='action_view_enrollment_history']" position="attributes">
+                <attribute name="invisible">is_view_hidden or enrollment_history_count == 0</attribute>
+            </xpath>
+
+
+            <xpath expr="//field[@name='status']" position="attributes">
+                <attribute name="statusbar_visible">draft,accept,reject</attribute>
+            </xpath>
+            <xpath expr="//field[@name='std_id']" position="after">
+                <field name="due_payment" readonly="status in ['accept', 'reject', 'left']"/>
+            </xpath>
+            <xpath expr="//field[@name='cnic']" position="after">
+                <field name="weight" readonly="status in ['accept', 'reject', 'left']"/>
+                <field name="height" readonly="status in ['accept', 'reject', 'left']"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- 5. Form Extension: Enrollment History Tab -->
+    <record id="enrollment_history_inherit" model="ir.ui.view">
+        <field name="name">student.student.form.inherit.history</field>
+        <field name="model">student.student</field>
+        <field name="inherit_id" ref="school.view_student_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook/page[field[@name='academic_history_ids']]" position="after">
+                <page string="Enrollment History" name="enrollment_history">
+                    <field name="enrollment_history_ids" readonly="1">
+                        <list string="Enrollment History">
+                            <field name="transfer_date"/>
+                            <field name="old_code"/>
+                            <field name="old_std_id"/>
+                            <field name="old_institute_id"/>
+                            <field name="old_branch_id"/>
+                            <field name="old_level_id"/>
+                            <field name="old_grade_id"/>
+                            <field name="old_section_id"/>
+                        </list>
+                    </field>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+<!--     6. Form Extension: Academic Transcript Tab -->
+    <record id="academic_transcript_inherit" model="ir.ui.view">
+        <field name="name">student.student.form.inherit.transcript</field>
+        <field name="model">student.student</field>
+        <field name="inherit_id" ref="school.view_student_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook/page[field[@name='academic_history_ids']]" position="after">
+                <page string="Academic Performance Transcript" name="academic_transcript">
+                    <field name="academic_transcript_ids" readonly="1">
+                        <list string="Academic Performance Transcript">
+                            <field name="grade_id" readonly="1"/>
+                            <field name="section_id" readonly="1"/>
+                            <field name="first_marks" string="1st Term" class="text-center"/>
+                            <field name="mid_marks" string="Mid Term" class="text-center"/>
+                            <field name="second_marks" string="2nd Term" class="text-center"/>
+                            <field name="final_marks" string="Final Marks" class="text-center"/>
+                            <field name="total_marks" string="Total Marks" class="text-center fw-bold"/>
+                        </list>
+                    </field>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- 7. Standalone List View for Enrollment History (Opens via Smart Button) -->
+    <record id="view_enrollment_history_tree" model="ir.ui.view">
+        <field name="name">enrollment.history.list</field>
+        <field name="model">enrollment.history</field>
+        <field name="arch" type="xml">
+            <list string="Enrollment History" create="false" edit="false">
+                <field name="transfer_date"/>
+                <field name="old_code"/>
+                <field name="old_std_id"/>
+                <field name="old_institute_id"/>
+                <field name="old_branch_id"/>
+                <field name="old_level_id"/>
+                <field name="old_grade_id"/>
+                <field name="old_section_id"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- 8. Standalone Form View for Enrollment History -->
+    <record id="view_enrollment_history_form" model="ir.ui.view">
+        <field name="name">enrollment.history.form</field>
+        <field name="model">enrollment.history</field>
+        <field name="arch" type="xml">
+            <form string="Enrollment History" create="false" edit="false">
+                <sheet>
+                    <group>
+                        <group string="Transfer Info">
+                            <field name="student_id" readonly="1"/>
+                            <field name="transfer_date" readonly="1"/>
+                            <field name="old_code" readonly="1"/>
+                            <field name="old_std_id" readonly="1"/>
+                        </group>
+                        <group string="Previous Hierarchy">
+                            <field name="old_institute_id" readonly="1"/>
+                            <field name="old_branch_id" readonly="1"/>
+                            <field name="old_level_id" readonly="1"/>
+                            <field name="old_grade_id" readonly="1"/>
+                            <field name="old_section_id" readonly="1"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- 9. Standalone List View for Academic Transcripts (Opens via Smart Button) -->
+    <record id="view_academic_transcript_tree" model="ir.ui.view">
+        <field name="name">academic.transcript.list</field>
+        <field name="model">academic.transcript</field>
+        <field name="arch" type="xml">
+            <list string="Academic Performance Transcripts">
+                <field name="grade_id"/>
+                <field name="section_id"/>
+                <field name="first_marks"/>
+                <field name="mid_marks"/>
+                <field name="second_marks"/>
+                <field name="final_marks"/>
+                <field name="total_marks"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- 10. Search View Extension -->
+    <record id="view_student_search_inherit" model="ir.ui.view">
+        <field name="name">student.student.search.inherit</field>
+        <field name="model">student.student</field>
+        <field name="inherit_id" ref="school.view_student_search"/>
+        <field name="arch" type="xml">
+            <xpath expr="//search" position="inside">
+                <searchpanel>
+                    <field name="institute_id" enable_counters="1"/>
+                    <field name="branch_id" enable_counters="1"/>
+                    <field name="level_id" enable_counters="1"/>
+                </searchpanel>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

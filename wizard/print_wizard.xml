@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Wizard Form View -->
+    <record id="view_print_wizard_form" model="ir.ui.view">
+        <field name="name">print.wizard.form</field>
+        <field name="model">print.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Print Students Summary">
+                <sheet>
+                    <group>
+                        <field name="institute_ids" widget="many2many_tags" options="{'no_create': True}" placeholder="Select Institutes..."/>
+
+                        <field name="branch_ids" widget="many2many_tags" options="{'no_create': True}" placeholder="Select Branches..."
+                               domain="[('institute_id', '=', institute_ids)] if institute_ids else []"/>
+
+                        <field name="level_ids" widget="many2many_tags" options="{'no_create': True}" placeholder="Select Levels..."
+                               domain="[('branch_ids', 'in', branch_ids)] if branch_ids else []"/>
+
+                        <field name="grade_ids" widget="many2many_tags" options="{'no_create': True}" placeholder="Select Grades..."
+                               domain="[('level_id', 'in', level_ids)] if level_ids else []"/>
+                    </group>
+                </sheet>
+                <footer>
+                    <button name="action_print_report" string="Print PDF" type="object" class="btn-primary"/>
+                    <button name="action_export_excel" string="Export Excel" type="object" class="btn-success"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- Action Window for the Wizard -->
+    <record id="action_print_wizard" model="ir.actions.server">
+        <field name="name">Print Students Summary</field>
+        <field name="model_id" ref="model_print_wizard"/>
+        <field name="state">code</field>
+        <field name="code">
+            action = {
+            'type': 'ir.actions.act_window',
+            'res_model': 'print.wizard',
+            'view_mode': 'form',
+            'target': 'new',
+            }
+        </field>
+    </record>
+
+    <!-- New Top-Level Menu: Reporting -->
+    <menuitem id="menu_reporting"
+              parent="school.menu_school_root"
+              name="Reporting"
+              sequence="50"/>
+
+    <!-- Reporting Sub-menu -->
+    <menuitem id="menu_print_student_summary"
+              name="Print Students Summary"
+              parent="menu_reporting"
+              action="action_print_wizard"
+              sequence="10"/>
+
+</odoo>

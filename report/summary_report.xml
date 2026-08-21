@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="action_report_student_summary" model="ir.actions.report">
+        <field name="name">Student Summary Report</field>
+        <field name="model">print.wizard</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">school_extension.report_student_summary</field>
+        <field name="report_file">school_extension.report_student_summary</field>
+        <field name="print_report_name">'Student_Summary'</field>
+        <field name="binding_type">report</field>
+    </record>
+
+    <template id="report_student_summary">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="wizard">
+                <t t-call="web.external_layout">
+                    <style>
+                        .page {
+                        margin: 0 !important;
+                        padding: 0 !important;
+                        }
+                        .page > div:first-child {
+                        margin-top: 0 !important;
+                        padding-top: 0 !important;
+                        }
+                        h2 { margin-top: 0 !important; }
+                        .row { margin-bottom: 0.5rem !important; }
+                    </style>
+
+                    <div class="page" style="margin: 0; padding: 0;">
+                        <div class="row align-items-center" style="margin-bottom: 0.5rem;">
+                            <div class="col-8 text-start">
+                                <h2 style="margin: 0; padding: 0;">Students Summary Report</h2>
+                            </div>
+                            <div class="col-4 text-end">
+                                <strong>Date:</strong> <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%Y-%m-%d')"/>
+                            </div>
+                        </div>
+
+                        <table class="table table-bordered align-middle text-center" style="width: 100%; margin-top: 0.5rem;">
+                            <thead>
+                                <tr style="background-color: #cfcfcf; color: #5e3b69;">
+                                    <th>SR. NO.</th>
+                                    <th>NAME</th>
+                                    <th>STATUS</th>
+                                    <th>INSTITUTE</th>
+                                    <th>BRANCH</th>
+                                    <th>GRADE</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-foreach="wizard.line_ids" t-as="line">
+                                    <tr>
+                                        <td><span t-field="line.sr_no"/></td>
+                                        <td class="text-start"><span t-field="line.student_id.name"/></td>
+                                        <td><span t-field="line.status"/></td>
+                                        <td><span t-field="line.institute_id.name"/></td>
+                                        <td><span t-field="line.branch_id.name"/></td>
+                                        <td><span t-field="line.grade_id.name"/></td>
+                                    </tr>
+                                </t>
+                                <tr style="background-color: #e9ecef; font-weight: bold;">
+                                    <td colspan="5" class="text-end">Total Students:</td>
+                                    <td class="text-center">
+                                        <span t-field="wizard.total_students"/>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+</odoo>
